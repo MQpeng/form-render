@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@form-render/core": ["packages/core/src/index.ts"]
+      "@form-render/core": ["packages/core/src/index.ts"],
+      "@form-render/plugin": ["packages/plugin/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
