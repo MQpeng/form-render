@@ -1,0 +1,256 @@
+import { ErrorSchema } from './errors';
+import { FormProperty } from './form.property';
+import { FRSizeLDSType, FRStyleInterface, FRValue } from './interface';
+export type FRPlacement =
+  | 'top'
+  | 'left'
+  | 'right'
+  | 'bottom'
+  | 'topLeft'
+  | 'topRight'
+  | 'bottomLeft'
+  | 'bottomRight'
+  | 'leftTop'
+  | 'leftBottom'
+  | 'rightTop'
+  | 'rightBottom';
+
+export type FRTrigger = 'click' | 'focus' | 'hover';
+
+export type FRLSSize = 'large' | 'small';
+
+export type FRDLSSize = FRSizeLDSType;
+
+export interface FRGridSizeSchema {
+  span?: number | null;
+  order?: number | null;
+  offset?: number | null;
+  push?: number | null;
+  pull?: number | null;
+}
+
+export interface FRGridSchema {
+  /**
+   * 栅格间隔
+   */
+  gutter?: number | null;
+  /**
+   * 栅格占位格数，为 `0` 时相当于 `display: none`
+   */
+  span?: number | null;
+  /**
+   * 数组索引栅格占位格数，为 `0` 时相当于 `display: none`，限 `type: 'array'` 时有效
+   */
+  arraySpan?: number | null;
+  /**
+   * 栅格左侧的间隔格数，间隔内不可以有栅格
+   */
+  offset?: number | null;
+  xs?: number | FRGridSizeSchema;
+  sm?: number | FRGridSizeSchema;
+  md?: number | FRGridSizeSchema;
+  lg?: number | FRGridSizeSchema;
+  xl?: number | FRGridSizeSchema;
+  xxl?: number | FRGridSizeSchema;
+}
+
+export type FRBuiltInWidgets =
+  | 'text'
+  | 'string'
+  | 'number'
+  | 'integer'
+  | 'date'
+  | 'time'
+  | 'radio'
+  | 'checkbox'
+  | 'boolean'
+  | 'textarea'
+  | 'select'
+  | 'tree-select'
+  | 'tag'
+  | 'upload'
+  | 'transfer'
+  | 'slider'
+  | 'rate'
+  | 'autocomplete'
+  | 'cascader'
+  | 'mention'
+  | 'custom'
+  | 'array'
+  | 'object';
+
+export interface FRRenderSchema {
+  /**
+   * 指定采用什么小部件渲染，所有小部件名可[查阅文档](https://ng-alain.com/)
+   */
+  widget?: FRBuiltInWidgets | (string & {});
+  /**
+   * 自定义类，等同 `[ngClass]` 值
+   */
+  class?: FRSizeLDSType;
+  /**
+   * 元素组件大小
+   */
+  size?: FRDLSSize;
+  /**
+   * 指定宽度，单位：`px`
+   */
+  width?: number;
+  /**
+   * 响应式属性
+   */
+  grid?: FRGridSchema;
+  /**
+   * 标签可选信息
+   */
+  optional?: string;
+  /**
+   * 标签可选帮助，使用 `nz-tooltip` 展示
+   */
+  optionalHelp?: string | FROptionalHelp;
+}
+
+export interface FROptionalHelp {
+  text?: string;
+  i18n?: string;
+  /** 文字提示背景颜色 */
+  bgColor?: string;
+  /** 图标，默认：`question-circle` */
+  icon?: string;
+  placement?: FRPlacement;
+  trigger?: FRTrigger;
+  mouseEnterDelay?: number;
+  mouseLeaveDelay?: number;
+  overlayClassName?: string;
+  overlayStyle?: FRStyleInterface;
+}
+
+export interface FRHorizontalLayoutSchema {
+  /**
+   * `label` 栅格占位格数，默认：`5`
+   * - `0` 时相当于 `display: none`
+   * - 限 `horizontal` 水平布局有效
+   */
+  spanLabel?: number | null;
+
+  /**
+   * `control` 栅格占位格数，默认：`19`
+   * - `0` 时相当于 `display: none`
+   * - 限 `horizontal` 水平布局有效
+   */
+  spanControl?: number | null;
+
+  /**
+   * `control` 栅格左侧的间隔格数，间隔内不可以有栅格
+   * - 限 `horizontal` 水平布局有效
+   */
+  offsetControl?: number | null;
+
+  /**
+   * `label` 固定宽度
+   * - 限 `horizontal` 水平布局有效
+   */
+  spanLabelFixed?: number | null;
+}
+
+export interface FRSchemaI18n {
+  /**
+   * 指 `schema.title` 的国际化键值
+   */
+  i18n?: string;
+  /**
+   * 对应 `schema.description` 国际化
+   */
+  descriptionI18n?: string;
+}
+
+export interface FRVisibleIfReturn {
+  show?: boolean;
+  required?: boolean;
+}
+
+export interface FRVisibleIf {
+  [key: string]:
+    | any[]
+    | ((
+        value: FRValue,
+        property: FormProperty
+      ) => boolean | FRVisibleIfReturn | null);
+}
+
+/** 指定如何渲染 `Schema` */
+export interface FRUISchemaItem
+  extends FRRenderSchema,
+    FRHorizontalLayoutSchema,
+    ErrorSchema,
+    FRSchemaI18n {
+  [key: string]: any;
+
+  /**
+   * Whether to enable the debug mode, the trust information will be printed out when the data is changed and verified, it is not recommended to use it in the production environment
+   *
+   * 是否开启调试模式，在数据变更、校验会打印出相信信息，不建议在生产环境中使用
+   */
+  debug?: boolean;
+
+  /**
+   * Order of property
+   *
+   * 属性顺序，当你只想某几个属性靠前时，则允许使用通配符 `*` 来表示剩余部分，且只允许出现一次
+   *
+   * @example
+   *
+   * [ 'a', 'b', 'c', 'd' ] + [ 'c', 'b', '*' ] = [ 'c', 'b', 'a', 'd']
+   */
+  order?: string[];
+  /**
+   * Whether to hide
+   *
+   * 是否隐藏
+   */
+  hidden?: boolean;
+  /**
+   * Is visible with conditions (When there are multiple, you can specify logic vis `visibleIfLogical`)
+   *
+   * 指定条件时才显示（当多个时可以通过 `visibleIfLogical` 来指定处理逻辑），但需要**注意**：
+   * - 键值表示监听对象属性名
+   * - JSON Schema 校验是各属性独立运行，监听对象属性每一次值变化都会重新做一次整个JSON结构计算
+   *
+   * 有效格式包括：
+   * - `visibleIf: { shown: [ true ] }`：当 `shown: true` 时才显示当前属性
+   * - `visibleIf: { shown: [ '$ANY$' ] }`：当 `shown` 包括任意值时
+   * - `visibleIf: { shown: (value: any, property: FormProperty) => value > 0 }`：复杂表达式
+   */
+  visibleIf?: FRVisibleIf;
+
+  /**
+   * The logical used when specifying multiple `visibleIf`, default: `or`
+   *
+   * 指定多个 `visibleIf` 时采用的逻辑关系，默认：`or`
+   */
+  visibleIfLogical?: 'or' | 'and';
+
+  /**
+   * ACL 配置
+   */
+  // acl?: ACLCanType | null;
+}
+
+/**
+ * UI Schema，KEY名**务必**是 `$` 开头（例如：`$name`、`$id`），以便能区分KEY值还是UI选项
+ * - 结构层级应同 `FRSchema` 一致
+ * - 当KEY为 `*` 时表示对所有子表单元素都有效
+ */
+export interface FRUISchema {
+  [key: string]: FRUISchemaItem | FRUISchemaItemRun;
+}
+
+/**
+ * @inner
+ */
+export interface FRUISchemaItemRun extends FRUISchemaItem {
+  /** @internal 自定义模板 */
+  _render?: any;
+  /** @internal 是否必填 */
+  _required?: boolean;
+}
