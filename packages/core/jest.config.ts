@@ -8,4 +8,7 @@ export default {
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: '../../coverage/packages/core',
+  moduleNameMapper: {
+    '^lodash-es$': 'lodash',
+  },
 };
